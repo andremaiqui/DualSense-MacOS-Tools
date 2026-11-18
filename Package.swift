@@ -5,7 +5,11 @@ let package = Package(
     name: "DSUpdater",
     platforms: [.macOS(.v26)],
     targets: [
-        .executableTarget(name: "DSUpdater", path: "Sources/DSUpdater")
+        .executableTarget(
+            name: "DSUpdater",
+            path: "Sources/DSUpdater",
+            resources: [.process("Resources")]
+        )
     ],
     swiftLanguageModes: [.v5]
 )

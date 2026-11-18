@@ -2,14 +2,23 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var model = UpdaterModel.shared
+    @AppStorage("appLanguage") private var selectedLanguage = AppLanguage.portugueseBrazil.rawValue
     @State private var confirming = false
+
+    private var appLanguage: AppLanguage {
+        AppLanguage(rawValue: selectedLanguage) ?? .portugueseBrazil
+    }
+
+    private func localized(_ key: String) -> String {
+        appLocalized(key, language: appLanguage)
+    }
 
     var body: some View {
         VStack(spacing: 20) {
             header
             content
             Spacer(minLength: 0)
-            Text("Software independente e não oficial. Firmware pertence à Sony.")
+            Text(localized("Software independente e não oficial. Firmware pertence à Sony."))
                 .font(.caption2).foregroundStyle(.secondary)
         }
         .padding(.horizontal, 28)
@@ -22,9 +31,9 @@ struct ContentView: View {
             model.startWatching()
             await model.refresh()
         }
-        .alert("Instalar firmware?", isPresented: $confirming) {
-            Button("Cancelar", role: .cancel) {}
-            Button("Instalar") { Task { await model.install() } }
+        .alert(localized("Instalar firmware?"), isPresented: $confirming) {
+            Button(localized("Cancelar"), role: .cancel) {}
+            Button(localized("Instalar")) { Task { await model.install() } }
         } message: {
             Text("Mantenha o cabo USB conectado e o Mac ligado até o fim. Pode levar vários minutos. Não desconecte o controle durante a gravação.")
         }
@@ -34,12 +43,11 @@ struct ContentView: View {
 
     private var header: some View {
         VStack(spacing: 14) {
-            Image(systemName: "gamecontroller.fill")
-                .font(.system(size: 38, weight: .semibold))
-                .foregroundStyle(.primary)
-                .symbolEffect(.pulse, isActive: model.isUpdating || model.phase == .loading)
-                .frame(width: 92, height: 92)
-                .glassEffect(.regular, in: .circle)
+            Image("DualSenseController", bundle: .module)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 240, height: 135)
+                .accessibilityLabel(localized("Controle DualSense"))
             VStack(spacing: 3) {
                 Text("Firmware do controle")
                     .font(.system(size: 26, weight: .bold, design: .rounded))
@@ -56,7 +64,7 @@ struct ContentView: View {
         case .loading:
             VStack(spacing: 12) {
                 ProgressView().controlSize(.large)
-                Text("Procurando o controle…").foregroundStyle(.secondary)
+                Text(localized("Procurando o controle…")).foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 28)
@@ -64,7 +72,7 @@ struct ContentView: View {
 
         case .noController(let detail):
             VStack(spacing: 10) {
-                Label("Nenhum controle encontrado", systemImage: "cable.connector.slash")
+                Label(localized("Nenhum controle encontrado"), systemImage: "cable.connector.slash")
                     .font(.headline)
                 Text("Conecte o DualSense com um cabo USB de dados (cabos só de carga não funcionam) e feche jogos ou outras ferramentas que usem o controle.")
                     .font(.callout).foregroundStyle(.secondary)
@@ -73,7 +81,7 @@ struct ContentView: View {
                     .multilineTextAlignment(.center)
                 HStack(spacing: 8) {
                     ProgressView().controlSize(.small)
-                    Text("Aguardando você conectar o controle…").font(.callout)
+                    Text(localized("Aguardando você conectar o controle…")).font(.callout)
                 }
                 .padding(.top, 4)
             }
@@ -99,13 +107,13 @@ struct ContentView: View {
     private var infoCard: some View {
         VStack(spacing: 10) {
             if let i = model.info {
-                row("Firmware atual", i.versionHex)
+                row(localized("Firmware atual"), i.versionHex)
                 Divider()
-                row("Compilação", i.buildDate.split(separator: " ").joined(separator: " ") + " " + i.buildTime)
+                row(localized("Compilação"), i.buildDate.split(separator: " ").joined(separator: " ") + " " + i.buildTime)
                 Divider()
-                row("Disponível na Sony", model.latest ?? "—")
+                row(localized("Disponível na Sony"), model.latest ?? "—")
                 if i.isEdge {
-                    Text("Atualizações no DualSense Edge ainda não foram testadas pelo projeto.")
+                    Text(localized("Atualizações no DualSense Edge ainda não foram testadas pelo projeto."))
                         .font(.caption).foregroundStyle(.orange)
                 }
             }
@@ -119,13 +127,13 @@ struct ContentView: View {
                 switch model.availability {
                 case .available:
                     Button { confirming = true } label: {
-                        Label("Instalar firmware mais recente", systemImage: "arrow.down.circle.fill")
+                        Label(localized("Instalar firmware mais recente"), systemImage: "arrow.down.circle.fill")
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.glassProminent).controlSize(.extraLarge)
                 case .upToDate:
                     Label {
-                        Text("Seu controle está atualizado")
+                        Text(localized("Seu controle está atualizado"))
                     } icon: {
                         Image(systemName: "checkmark.seal.fill").foregroundStyle(.green)
                     }
@@ -139,7 +147,7 @@ struct ContentView: View {
                     }
                 }
                 Button { Task { await model.refresh() } } label: {
-                    Label("Buscar atualizações", systemImage: "arrow.clockwise")
+                    Label(localized("Buscar atualizações"), systemImage: "arrow.clockwise")
                         .font(.headline)
                         .padding(.horizontal, 22)
                         .padding(.vertical, 10)
@@ -160,7 +168,7 @@ struct ContentView: View {
                 .animation(.smooth, value: model.progress)
             GlassProgressBar(value: model.progress)
             Text(model.status).font(.callout)
-            Label("Não desconecte o cabo nem feche o app.", systemImage: "exclamationmark.triangle.fill")
+            Label(localized("Não desconecte o cabo nem feche o app."), systemImage: "exclamationmark.triangle.fill")
                 .font(.caption).foregroundStyle(.orange)
         }
         .glassCard()
@@ -169,9 +177,9 @@ struct ContentView: View {
     @ViewBuilder private var resultBanner: some View {
         switch model.phase {
         case .finished(let text):
-            banner("Atualização concluída", text, "checkmark.circle.fill", .green)
+            banner(localized("Atualização concluída"), text, "checkmark.circle.fill", .green)
         case .failed(let text):
-            banner("A atualização falhou",
+            banner(localized("A atualização falhou"),
                    "\(text)\n\nReconecte o controle e confira a versão antes de tentar de novo.",
                    "xmark.octagon.fill", .red)
         default: EmptyView()
@@ -180,7 +188,7 @@ struct ContentView: View {
 
     @ViewBuilder private var logView: some View {
         if !model.log.isEmpty {
-            DisclosureGroup("Detalhes") {
+            DisclosureGroup(localized("Detalhes")) {
                 ScrollView {
                     Text(model.log.joined(separator: "\n"))
                         .font(.system(.caption, design: .monospaced))

@@ -39,10 +39,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 @main
 struct DSUpdaterApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
+    @AppStorage("appLanguage") private var selectedLanguage = AppLanguage.portugueseBrazil.rawValue
+
+    private var appLanguage: AppLanguage {
+        AppLanguage(rawValue: selectedLanguage) ?? .portugueseBrazil
+    }
 
     var body: some Scene {
-        WindowGroup("Firmware do controle") { ContentView() }
-            .windowStyle(.hiddenTitleBar)
-            .windowResizability(.contentSize)
+        WindowGroup(appLocalized("Firmware do controle", language: appLanguage)) {
+            ContentView()
+                .environment(\.locale, appLanguage.locale)
+        }
+        .windowStyle(.hiddenTitleBar)
+        .windowResizability(.contentSize)
+        .commands {
+            CommandGroup(replacing: .appSettings) {
+                SettingsLink {
+                    Text(appLocalized("Configurações…", language: appLanguage))
+                }
+                .keyboardShortcut(",", modifiers: .command)
+            }
+        }
+
+        Settings {
+            SettingsView()
+                .environment(\.locale, appLanguage.locale)
+        }
     }
 }
