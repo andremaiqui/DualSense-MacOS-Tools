@@ -1,4 +1,10 @@
+<div align="center">
+
+<img width="300" alt="DS Updater" src="https://github.com/user-attachments/assets/3e5dd95e-6f92-4b46-a268-19ce8e3608ea" />
+
 # DS Updater
+
+</div>
 
 Interface gráfica para atualizar o firmware de controles DualSense e DualSense Edge no macOS. O app usa o [dsmactools](https://github.com/olliejudge/dsmactools) para detectar o controle, consultar a versão disponível e instalar o firmware.
 
