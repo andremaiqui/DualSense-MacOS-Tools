@@ -27,8 +27,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if window.title.localizedCaseInsensitiveContains("settings") {
             window.titlebarAppearsTransparent = true
             window.titlebarSeparatorStyle = .none
-            window.titleVisibility = .visible
+            window.titleVisibility = .hidden
             window.title = "Settings"
+            window.isMovableByWindowBackground = true
             window.isExcludedFromWindowsMenu = true
             return
         }
@@ -100,7 +101,8 @@ struct DSUpdaterApp: App {
                 .environment(\.locale, appLanguage.locale)
                 .preferredColorScheme(appAppearance.colorScheme)
         }
-        .defaultSize(width: 360, height: 180)
+        .windowStyle(.hiddenTitleBar)
+        .defaultSize(width: 360, height: 220)
         .windowResizability(.contentSize)
     }
 }

@@ -120,21 +120,28 @@ struct SettingsView: View {
     @Bindable private var settings = AppSettings.shared
 
     var body: some View {
-        Form {
-            Picker(appLocalized("Idioma do app", language: settings.language), selection: $settings.language) {
-                ForEach(AppLanguage.allCases) { language in
-                    Text(language.name).tag(language)
+        VStack(spacing: 12) {
+            Text("Settings")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+
+            Form {
+                Picker(appLocalized("Idioma do app", language: settings.language), selection: $settings.language) {
+                    ForEach(AppLanguage.allCases) { language in
+                        Text(language.name).tag(language)
+                    }
+                }
+                Picker(appLocalized("Aparência", language: settings.language), selection: $settings.appearance) {
+                    ForEach(AppAppearance.allCases) { appearance in
+                        Text(appLocalized(appearance.localizationKey, language: settings.language))
+                            .tag(appearance)
+                    }
                 }
             }
-            Picker(appLocalized("Aparência", language: settings.language), selection: $settings.appearance) {
-                ForEach(AppAppearance.allCases) { appearance in
-                    Text(appLocalized(appearance.localizationKey, language: settings.language))
-                        .tag(appearance)
-                }
-            }
+            .formStyle(.grouped)
         }
-        .formStyle(.grouped)
         .scenePadding()
-        .frame(width: 360, height: 180)
+        .padding(.top, 10)
+        .frame(width: 360, height: 220)
     }
 }
