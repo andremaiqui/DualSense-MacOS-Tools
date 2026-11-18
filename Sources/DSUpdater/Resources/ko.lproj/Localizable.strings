@@ -37,3 +37,7 @@
 "O binário dsmactools não foi encontrado." = "dsmactools 바이너리를 찾을 수 없습니다.";
 "Buscar novamente" = "다시 검색";
 "Sem detalhes." = "세부 정보가 없습니다.";
+"Aparência" = "모양";
+"Padrão do sistema" = "시스템 설정";
+"Claro" = "라이트";
+"Escuro" = "다크";

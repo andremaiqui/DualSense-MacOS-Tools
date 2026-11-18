@@ -5,6 +5,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.orderFrontStandardAboutPanel(options: [
             .applicationVersion: "Version 0.1.0 (Developers: Andre Maiqui, Ollie Judge, nchie, VolksDroid)"
         ])
+        if let aboutWindow = NSApp.keyWindow {
+            configureAboutPanel(aboutWindow)
+        }
     }
 
     /// Faz o app aparecer no Dock e vir para a frente, mesmo rodando direto do Xcode/SwiftPM.
@@ -22,17 +25,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private static func configureWindow(_ window: NSWindow) {
         if window.title.localizedCaseInsensitiveContains("settings") {
+            window.titlebarAppearsTransparent = true
+            window.titlebarSeparatorStyle = .none
+            window.titleVisibility = .visible
+            window.title = "Settings"
             window.isExcludedFromWindowsMenu = true
             return
         }
 
-        guard !window.title.localizedCaseInsensitiveContains("about") else { return }
+        if window.title.localizedCaseInsensitiveContains("about") {
+            configureAboutPanel(window)
+            return
+        }
 
         window.titlebarAppearsTransparent = true
         window.titlebarSeparatorStyle = .none
         window.titleVisibility = .hidden
         window.title = "DSUpdater"
         window.miniwindowTitle = "DSUpdater"
+    }
+
+    private static func configureAboutPanel(_ window: NSWindow) {
+        window.title = "About"
+        window.titleVisibility = .visible
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
@@ -60,10 +75,15 @@ struct DSUpdaterApp: App {
         settings.language
     }
 
+    private var appAppearance: AppAppearance {
+        settings.appearance
+    }
+
     var body: some Scene {
         WindowGroup(appLocalized("Firmware do controle", language: appLanguage)) {
             ContentView()
                 .environment(\.locale, appLanguage.locale)
+                .preferredColorScheme(appAppearance.colorScheme)
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
@@ -78,8 +98,9 @@ struct DSUpdaterApp: App {
         Settings {
             SettingsView()
                 .environment(\.locale, appLanguage.locale)
+                .preferredColorScheme(appAppearance.colorScheme)
         }
-        .defaultSize(width: 360, height: 120)
+        .defaultSize(width: 360, height: 180)
         .windowResizability(.contentSize)
     }
 }

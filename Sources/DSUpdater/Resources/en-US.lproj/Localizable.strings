@@ -37,3 +37,7 @@
 "O binário dsmactools não foi encontrado." = "The dsmactools binary wasn't found.";
 "Buscar novamente" = "Search again";
 "Sem detalhes." = "No details.";
+"Aparência" = "Appearance";
+"Padrão do sistema" = "System default";
+"Claro" = "Light";
+"Escuro" = "Dark";

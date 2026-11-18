@@ -43,6 +43,30 @@ enum AppLanguage: String, CaseIterable, Identifiable {
 
 }
 
+enum AppAppearance: String, CaseIterable, Identifiable {
+    case system
+    case light
+    case dark
+
+    var id: String { rawValue }
+
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system: nil
+        case .light: .light
+        case .dark: .dark
+        }
+    }
+
+    var localizationKey: String {
+        switch self {
+        case .system: "Padrão do sistema"
+        case .light: "Claro"
+        case .dark: "Escuro"
+        }
+    }
+}
+
 @Observable
 @MainActor
 final class AppSettings {
@@ -54,10 +78,19 @@ final class AppSettings {
         }
     }
 
+    var appearance: AppAppearance {
+        didSet {
+            UserDefaults.standard.set(appearance.rawValue, forKey: "appAppearance")
+        }
+    }
+
     private init() {
         language = AppLanguage(
             rawValue: UserDefaults.standard.string(forKey: "appLanguage") ?? ""
         ) ?? .portugueseBrazil
+        appearance = AppAppearance(
+            rawValue: UserDefaults.standard.string(forKey: "appAppearance") ?? ""
+        ) ?? .system
     }
 }
 
@@ -93,9 +126,15 @@ struct SettingsView: View {
                     Text(language.name).tag(language)
                 }
             }
+            Picker(appLocalized("Aparência", language: settings.language), selection: $settings.appearance) {
+                ForEach(AppAppearance.allCases) { appearance in
+                    Text(appLocalized(appearance.localizationKey, language: settings.language))
+                        .tag(appearance)
+                }
+            }
         }
         .formStyle(.grouped)
         .scenePadding()
-        .frame(width: 360, height: 120)
+        .frame(width: 360, height: 180)
     }
 }
