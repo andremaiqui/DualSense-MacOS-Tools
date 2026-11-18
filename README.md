@@ -6,6 +6,38 @@
 
 </div>
 
+<div align="center">
+
+## Contribuições
+
+Se você gosta dos meus projetos, considere fazer uma pequena doação.
+
+</div>
+
+<div align="center">
+
+<table>
+  <tr>
+    <th align="center">Chave pix ❖</th>
+    <th align="center">Ethereum</th>
+    <th align="center">Bitcoin</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img width="180" height="180" src="https://github.com/user-attachments/assets/0c8eed80-a6e7-4f93-bef5-7d31c1237de9" alt="Chave Pix" />
+    </td>
+    <td align="center">
+      <img width="180" height="180" src="https://github.com/user-attachments/assets/902b34bc-ee97-4aee-83fa-0580ab0e12fe" alt="Ethereum" />
+    </td>
+    <td align="center">
+      <img width="180" height="180" src="https://github.com/user-attachments/assets/3d62c33b-b1be-4454-be79-924819ca55cc" alt="Bitcoin" />
+    </td>
+  </tr>
+</table>
+
+</div>
+
+
 Interface gráfica para atualizar o firmware de controles DualSense e DualSense Edge no macOS. O app usa o [dsmactools](https://github.com/olliejudge/dsmactools) para detectar o controle, consultar a versão disponível e instalar o firmware.
 
 > Este é um projeto independente e não oficial. O firmware pertence à Sony.
