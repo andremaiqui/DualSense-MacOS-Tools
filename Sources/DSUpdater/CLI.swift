@@ -56,7 +56,7 @@ enum CLI {
     static func run(_ args: [String],
                     onLine: @escaping @Sendable (String) -> Void = { _ in }) async -> CLIResult {
         guard let url = binaryURL else {
-            return CLIResult(status: 127, lines: ["O binário dsmactools não foi encontrado."])
+            return CLIResult(status: 127, lines: [appLocalized("O binário dsmactools não foi encontrado.")])
         }
         return await withCheckedContinuation { continuation in
             let process = Process()

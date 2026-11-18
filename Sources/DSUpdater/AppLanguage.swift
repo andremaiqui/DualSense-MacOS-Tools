@@ -1,4 +1,5 @@
 import SwiftUI
+import Observation
 
 enum AppLanguage: String, CaseIterable, Identifiable {
     case portugueseBrazil = "pt-BR"
@@ -19,32 +20,56 @@ enum AppLanguage: String, CaseIterable, Identifiable {
         }
     }
 
-    static var current: AppLanguage {
-        AppLanguage(rawValue: UserDefaults.standard.string(forKey: "appLanguage") ?? "") ?? .portugueseBrazil
+}
+
+@Observable
+@MainActor
+final class AppSettings {
+    static let shared = AppSettings()
+
+    var language: AppLanguage {
+        didSet {
+            UserDefaults.standard.set(language.rawValue, forKey: "appLanguage")
+        }
+    }
+
+    private init() {
+        language = AppLanguage(
+            rawValue: UserDefaults.standard.string(forKey: "appLanguage") ?? ""
+        ) ?? .portugueseBrazil
     }
 }
 
 func appLocalized(_ key: String, language: AppLanguage) -> String {
-    Bundle.module.localizedString(
+    guard let localizationPath = Bundle.module.path(
+        forResource: language.rawValue,
+        ofType: "lproj"
+    ), let localizationBundle = Bundle(path: localizationPath) else {
+        return key
+    }
+
+    return localizationBundle.localizedString(
         forKey: key,
         value: key,
-        table: "Localizable",
-        localizations: [language.locale.language]
+        table: "Localizable"
     )
 }
 
-struct SettingsView: View {
-    @AppStorage("appLanguage") private var selectedLanguage = AppLanguage.portugueseBrazil.rawValue
+func appLocalized(_ key: String) -> String {
+    let language = AppLanguage(
+        rawValue: UserDefaults.standard.string(forKey: "appLanguage") ?? ""
+    ) ?? .portugueseBrazil
+    return appLocalized(key, language: language)
+}
 
-    private var appLanguage: AppLanguage {
-        AppLanguage(rawValue: selectedLanguage) ?? .portugueseBrazil
-    }
+struct SettingsView: View {
+    @Bindable private var settings = AppSettings.shared
 
     var body: some View {
         Form {
-            Picker(appLocalized("Idioma do app", language: appLanguage), selection: $selectedLanguage) {
+            Picker(appLocalized("Idioma do app", language: settings.language), selection: $settings.language) {
                 ForEach(AppLanguage.allCases) { language in
-                    Text(language.name).tag(language.rawValue)
+                    Text(language.name).tag(language)
                 }
             }
         }

@@ -27,8 +27,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let busy = MainActor.assumeIsolated { UpdaterModel.shared.isUpdating }
         if busy {
             let alert = NSAlert()
-            alert.messageText = "Atualização em andamento"
-            alert.informativeText = "Sair agora pode danificar o controle. Aguarde terminar."
+            alert.messageText = appLocalized("Atualização em andamento")
+            alert.informativeText = appLocalized("Sair agora pode danificar o controle. Aguarde terminar.")
             alert.runModal()
             return .terminateCancel
         }
@@ -39,10 +39,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 @main
 struct DSUpdaterApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
-    @AppStorage("appLanguage") private var selectedLanguage = AppLanguage.portugueseBrazil.rawValue
+    private let settings = AppSettings.shared
 
     private var appLanguage: AppLanguage {
-        AppLanguage(rawValue: selectedLanguage) ?? .portugueseBrazil
+        settings.language
     }
 
     var body: some Scene {

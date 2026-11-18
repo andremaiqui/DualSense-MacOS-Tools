@@ -3,11 +3,11 @@ import AppKit
 
 struct ContentView: View {
     @ObservedObject var model = UpdaterModel.shared
-    @AppStorage("appLanguage") private var selectedLanguage = AppLanguage.portugueseBrazil.rawValue
+    private let settings = AppSettings.shared
     @State private var confirming = false
 
     private var appLanguage: AppLanguage {
-        AppLanguage(rawValue: selectedLanguage) ?? .portugueseBrazil
+        settings.language
     }
 
     private func localized(_ key: String) -> String {
@@ -36,20 +36,20 @@ struct ContentView: View {
             Button(localized("Cancelar"), role: .cancel) {}
             Button(localized("Instalar")) { Task { await model.install() } }
         } message: {
-            Text("Mantenha o cabo USB conectado e o Mac ligado até o fim. Pode levar vários minutos. Não desconecte o controle durante a gravação.")
+            Text(localized("Mantenha o cabo USB conectado e o Mac ligado até o fim. Pode levar vários minutos. Não desconecte o controle durante a gravação."))
         }
     }
 
     // MARK: Cabeçalho
 
     private var header: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 10) {
             if let imageURL = Bundle.module.url(forResource: "DualSenseController", withExtension: "png"),
                let image = NSImage(contentsOf: imageURL) {
                 Image(nsImage: image)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 240, height: 135)
+                    .frame(width: 180, height: 90)
                     .accessibilityLabel(localized("Controle DualSense"))
             } else {
                 Image(systemName: "gamecontroller.fill")
@@ -59,7 +59,7 @@ struct ContentView: View {
                     .accessibilityLabel(localized("Controle DualSense"))
             }
             VStack(spacing: 3) {
-                Text("Firmware do controle")
+                Text(localized("Firmware do controle"))
                     .font(.system(size: 26, weight: .bold, design: .rounded))
                 Text(model.info?.name ?? "DualSense")
                     .font(.callout).foregroundStyle(.secondary)
@@ -84,7 +84,7 @@ struct ContentView: View {
             VStack(spacing: 10) {
                 Label(localized("Nenhum controle encontrado"), systemImage: "cable.connector.slash")
                     .font(.headline)
-                Text("Conecte o DualSense com um cabo USB de dados (cabos só de carga não funcionam) e feche jogos ou outras ferramentas que usem o controle.")
+                Text(localized("Conecte o DualSense com um cabo USB de dados (cabos só de carga não funcionam) e feche jogos ou outras ferramentas que usem o controle."))
                     .font(.callout).foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                 Text(detail).font(.caption.monospaced()).foregroundStyle(.tertiary)
@@ -98,7 +98,7 @@ struct ContentView: View {
             .frame(maxWidth: .infinity)
             .padding(20)
             .glassEffect(.regular, in: .rect(cornerRadius: 24))
-            Button("Procurar de novo") { Task { await model.refresh() } }
+            Button(localized("Procurar de novo")) { Task { await model.refresh() } }
                 .buttonStyle(.glass)
 
         case .ready, .finished, .failed:
@@ -190,7 +190,7 @@ struct ContentView: View {
             banner(localized("Atualização concluída"), text, "checkmark.circle.fill", .green)
         case .failed(let text):
             banner(localized("A atualização falhou"),
-                   "\(text)\n\nReconecte o controle e confira a versão antes de tentar de novo.",
+                   "\(text)\n\n\(localized("Reconecte o controle e confira a versão antes de tentar de novo."))",
                    "xmark.octagon.fill", .red)
         default: EmptyView()
         }

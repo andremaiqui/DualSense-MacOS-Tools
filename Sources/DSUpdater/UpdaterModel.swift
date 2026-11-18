@@ -67,7 +67,7 @@ final class UpdaterModel: ObservableObject {
         latest = nil
         checkNote = nil
         availability = .unknown
-        phase = .noController("Controle desconectado.")
+        phase = .noController(appLocalized("Controle desconectado."))
     }
     var isUpdating: Bool { phase == .updating }
 
@@ -116,7 +116,7 @@ final class UpdaterModel: ObservableObject {
             if line.contains("Update available") { availability = .available }
         }
         if check.status != 0 || availability == .unknown {
-            checkNote = "Não foi possível consultar a Sony: " + Self.tail(check.lines)
+            checkNote = appLocalized("Não foi possível consultar a Sony:") + " " + Self.tail(check.lines)
         }
     }
 
@@ -127,7 +127,7 @@ final class UpdaterModel: ObservableObject {
         phase = .updating
         progress = 0
         log = []
-        status = "Preparando…"
+        status = appLocalized("Preparando…")
         activity = ProcessInfo.processInfo.beginActivity(
             options: [.idleSystemSleepDisabled, .userInitiated],
             reason: "Atualizando firmware do controle")
@@ -140,7 +140,7 @@ final class UpdaterModel: ObservableObject {
         if let a = activity { ProcessInfo.processInfo.endActivity(a); activity = nil }
 
         if result.status == 0 {
-            let summary = result.lines.last ?? "Atualização concluída."
+            let summary = result.lines.last ?? appLocalized("Atualização concluída.")
             try? await Task.sleep(nanoseconds: 3_000_000_000) // o controle reinicia
             phase = .ready
             await refresh()
@@ -156,17 +156,17 @@ final class UpdaterModel: ObservableObject {
             let nums = line[m].split(whereSeparator: { !$0.isNumber }).compactMap { Double($0) }
             if nums.count == 2, nums[1] > 0 {
                 progress = nums[0] / nums[1]
-                status = "Gravando firmware… \(Int(progress * 100))%"
+                status = "\(appLocalized("Gravando firmware…")) \(Int(progress * 100))%"
             }
         } else if line.contains("Preparing firmware") {
-            status = "Baixando firmware da Sony…"
+            status = appLocalized("Baixando firmware da Sony…")
         } else if line.contains("Preparing controller") {
-            status = "Preparando o controle…"
+            status = appLocalized("Preparando o controle…")
         } else if line.contains("Verifying") {
             progress = 1
-            status = "Verificando no controle…"
+            status = appLocalized("Verificando no controle…")
         } else if line.contains("Finalization sent") {
-            status = "Finalizando…"
+            status = appLocalized("Finalizando…")
         }
     }
 
