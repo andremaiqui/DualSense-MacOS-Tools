@@ -1,6 +1,12 @@
 import SwiftUI
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    static func showAboutPanel() {
+        NSApp.orderFrontStandardAboutPanel(options: [
+            .applicationVersion: "Version 0.1.0 (Developers: Andre Maiqui, Ollie Judge, nchie, VolksDroid)"
+        ])
+    }
+
     /// Faz o app aparecer no Dock e vir para a frente, mesmo rodando direto do Xcode/SwiftPM.
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
@@ -52,6 +58,13 @@ struct DSUpdaterApp: App {
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
+        .commands {
+            CommandGroup(replacing: .appInfo) {
+                Button("About DS Updater") {
+                    AppDelegate.showAboutPanel()
+                }
+            }
+        }
 
         Settings {
             SettingsView()
