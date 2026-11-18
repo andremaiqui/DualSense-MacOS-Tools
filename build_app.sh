@@ -17,7 +17,11 @@ swift build -c release
 APP="DSUpdater.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp "$(swift build -c release --show-bin-path)/DSUpdater" "$APP/Contents/MacOS/"
+BIN_PATH="$(swift build -c release --show-bin-path)"
+cp "$BIN_PATH/DSUpdater" "$APP/Contents/MacOS/"
+if [ -d "$BIN_PATH/DSUpdater_DSUpdater.bundle" ]; then
+    cp -R "$BIN_PATH/DSUpdater_DSUpdater.bundle" "$APP/Contents/Resources/"
+fi
 cp "$CLI" "$APP/Contents/Resources/dsmactools"
 cp Info.plist "$APP/Contents/"
 cp DSUpdater.icns "$APP/Contents/Resources/"
