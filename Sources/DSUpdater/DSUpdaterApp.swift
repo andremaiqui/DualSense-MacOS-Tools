@@ -15,15 +15,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NotificationCenter.default.addObserver(
             forName: NSWindow.didBecomeMainNotification, object: nil, queue: .main
         ) { note in
-            (note.object as? NSWindow).map(Self.blendTitlebar)
+            (note.object as? NSWindow).map(Self.configureWindow)
         }
-        DispatchQueue.main.async { NSApp.windows.forEach(Self.blendTitlebar) }
+        DispatchQueue.main.async { NSApp.windows.forEach(Self.configureWindow) }
     }
 
-    private static func blendTitlebar(_ window: NSWindow) {
+    private static func configureWindow(_ window: NSWindow) {
+        if window.title.localizedCaseInsensitiveContains("settings") {
+            window.isExcludedFromWindowsMenu = true
+            return
+        }
+
+        guard !window.title.localizedCaseInsensitiveContains("about") else { return }
+
         window.titlebarAppearsTransparent = true
         window.titlebarSeparatorStyle = .none
         window.titleVisibility = .hidden
+        window.title = "DSUpdater"
+        window.miniwindowTitle = "DSUpdater"
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
