@@ -52,14 +52,6 @@ struct DSUpdaterApp: App {
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
-        .commands {
-            CommandGroup(replacing: .appSettings) {
-                SettingsLink {
-                    Text(appLocalized("Configurações…", language: appLanguage))
-                }
-                .keyboardShortcut(",", modifiers: .command)
-            }
-        }
 
         Settings {
             SettingsView()
