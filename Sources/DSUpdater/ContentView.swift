@@ -15,17 +15,20 @@ struct ContentView: View {
     }
 
     var body: some View {
-        VStack(spacing: 20) {
-            header
-            content
-            Spacer(minLength: 0)
-            Text(localized("Software independente e não oficial. Firmware pertence à Sony."))
-                .font(.caption2).foregroundStyle(.secondary)
+        GlassEffectContainer(spacing: 20) {
+            VStack(spacing: 20) {
+                header
+                content
+                Spacer(minLength: 0)
+                Text(localized("Software independente e não oficial. Firmware pertence à Sony."))
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 28)
+            .padding(.top, 40)
+            .padding(.bottom, 16)
+            .frame(width: 480, height: 640)
         }
-        .padding(.horizontal, 28)
-        .padding(.top, 40)
-        .padding(.bottom, 16)
-        .frame(width: 480, height: 640)
+        .containerBackground(.clear, for: .window)
         .animation(.smooth, value: model.phase)
         .animation(.smooth, value: model.availability)
         .task {
