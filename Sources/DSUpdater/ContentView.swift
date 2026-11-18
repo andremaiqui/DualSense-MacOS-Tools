@@ -98,8 +98,15 @@ struct ContentView: View {
             .frame(maxWidth: .infinity)
             .padding(20)
             .glassEffect(.regular, in: .rect(cornerRadius: 24))
-            Button(localized("Procurar de novo")) { Task { await model.refresh() } }
-                .buttonStyle(.glass)
+            Button { Task { await model.refresh() } } label: {
+                Label(localized("Buscar novamente"), systemImage: "arrow.clockwise")
+                    .font(.headline)
+                    .padding(.horizontal, 22)
+                    .padding(.vertical, 10)
+            }
+            .buttonStyle(.glass)
+            .controlSize(.large)
+            .padding(.top, 8)
 
         case .ready, .finished, .failed:
             infoCard
