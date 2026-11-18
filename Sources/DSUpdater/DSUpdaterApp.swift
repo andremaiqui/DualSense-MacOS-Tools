@@ -14,6 +14,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
+        AppSettings.shared.applyAppearance()
         // Barra de título contínua com o conteúdo, sem linha separando os botões do semáforo.
         NotificationCenter.default.addObserver(
             forName: NSWindow.didBecomeMainNotification, object: nil, queue: .main
@@ -84,7 +85,7 @@ struct DSUpdaterApp: App {
         WindowGroup(appLocalized("Firmware do controle", language: appLanguage)) {
             ContentView()
                 .environment(\.locale, appLanguage.locale)
-                .preferredColorScheme(appAppearance.colorScheme)
+                .animation(.easeInOut(duration: 0.35), value: appAppearance)
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
@@ -99,7 +100,6 @@ struct DSUpdaterApp: App {
         Settings {
             SettingsView()
                 .environment(\.locale, appLanguage.locale)
-                .preferredColorScheme(appAppearance.colorScheme)
         }
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 360, height: 220)

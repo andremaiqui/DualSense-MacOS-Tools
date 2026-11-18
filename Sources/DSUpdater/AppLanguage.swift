@@ -1,5 +1,6 @@
-import SwiftUI
 import Observation
+import AppKit
+import SwiftUI
 
 enum AppLanguage: String, CaseIterable, Identifiable {
     case portugueseBrazil = "pt-BR"
@@ -50,11 +51,14 @@ enum AppAppearance: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var colorScheme: ColorScheme? {
+    var appKitAppearance: NSAppearance? {
         switch self {
-        case .system: nil
-        case .light: .light
-        case .dark: .dark
+        case .system:
+            nil
+        case .light:
+            NSAppearance(named: .aqua)
+        case .dark:
+            NSAppearance(named: .darkAqua)
         }
     }
 
@@ -81,6 +85,7 @@ final class AppSettings {
     var appearance: AppAppearance {
         didSet {
             UserDefaults.standard.set(appearance.rawValue, forKey: "appAppearance")
+            applyAppearance()
         }
     }
 
@@ -91,6 +96,11 @@ final class AppSettings {
         appearance = AppAppearance(
             rawValue: UserDefaults.standard.string(forKey: "appAppearance") ?? ""
         ) ?? .system
+    }
+
+    /// Define uma única aparência para todo o processo, incluindo janelas AppKit.
+    func applyAppearance() {
+        NSApp.appearance = appearance.appKitAppearance
     }
 }
 
@@ -119,6 +129,17 @@ func appLocalized(_ key: String) -> String {
 struct SettingsView: View {
     @Bindable private var settings = AppSettings.shared
 
+    private var appearanceSelection: Binding<AppAppearance> {
+        Binding(
+            get: { settings.appearance },
+            set: { appearance in
+                withAnimation(.easeInOut(duration: 0.35)) {
+                    settings.appearance = appearance
+                }
+            }
+        )
+    }
+
     var body: some View {
         VStack(spacing: 12) {
             Text("Settings")
@@ -131,7 +152,7 @@ struct SettingsView: View {
                         Text(language.name).tag(language)
                     }
                 }
-                Picker(appLocalized("Aparência", language: settings.language), selection: $settings.appearance) {
+                Picker(appLocalized("Aparência", language: settings.language), selection: appearanceSelection) {
                     ForEach(AppAppearance.allCases) { appearance in
                         Text(appLocalized(appearance.localizationKey, language: settings.language))
                             .tag(appearance)
@@ -143,5 +164,6 @@ struct SettingsView: View {
         .scenePadding()
         .padding(.top, 10)
         .frame(width: 360, height: 220)
+        .animation(.easeInOut(duration: 0.35), value: settings.appearance)
     }
 }
