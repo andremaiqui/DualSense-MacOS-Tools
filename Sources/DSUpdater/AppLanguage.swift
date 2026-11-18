@@ -4,6 +4,13 @@ import Observation
 enum AppLanguage: String, CaseIterable, Identifiable {
     case portugueseBrazil = "pt-BR"
     case englishUnitedStates = "en-US"
+    case spanishLatinAmerica = "es-419"
+    case spanishSpain = "es-ES"
+    case japanese = "ja"
+    case french = "fr"
+    case german = "de"
+    case italian = "it"
+    case korean = "ko"
 
     var id: String { rawValue }
 
@@ -17,6 +24,20 @@ enum AppLanguage: String, CaseIterable, Identifiable {
             "Português (Brasil)"
         case .englishUnitedStates:
             "English (United States)"
+        case .spanishLatinAmerica:
+            "Español (Latinoamérica)"
+        case .spanishSpain:
+            "Español (España)"
+        case .japanese:
+            "日本語"
+        case .french:
+            "Français"
+        case .german:
+            "Deutsch"
+        case .italian:
+            "Italiano"
+        case .korean:
+            "한국어"
         }
     }
 

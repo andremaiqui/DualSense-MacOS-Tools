@@ -28,6 +28,10 @@ struct ContentView: View {
         .frame(width: 480, height: 640)
         .animation(.smooth, value: model.phase)
         .animation(.smooth, value: model.availability)
+        .onChange(of: appLanguage) { _, _ in
+            guard !model.isUpdating else { return }
+            Task { await model.refresh() }
+        }
         .task {
             model.startWatching()
             await model.refresh()
