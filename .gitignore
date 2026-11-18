@@ -1,0 +1,16 @@
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# Xcode
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# Artefatos locais de distribuição
+DSUpdater.app/
+DSUpdater-*.zip
+
+# macOS
+.DS_Store

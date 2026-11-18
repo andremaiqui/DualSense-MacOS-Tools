@@ -3,6 +3,13 @@
 # Gera DSUpdater.app com o dsmactools embutido.
 set -euo pipefail
 cd "$(dirname "$0")"
+
+# Prefere o Xcode completo: as Command Line Tools não incluem todos os plug-ins
+# de macro usados pelas versões atuais do SwiftUI.
+if [ -d "/Applications/Xcode.app/Contents/Developer" ]; then
+    export DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer"
+fi
+
 CLI="${1:-$(command -v dsmactools || true)}"
 [ -x "$CLI" ] || { echo "dsmactools não encontrado. Instale com Homebrew ou passe o caminho."; exit 1; }
 
