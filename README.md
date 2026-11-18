@@ -1,6 +1,6 @@
 <div align="center">
 
-<img width="300" alt="DS Updater" src="https://github.com/user-attachments/assets/3e5dd95e-6f92-4b46-a268-19ce8e3608ea" />
+<img width="200" alt="DS Updater" src="https://github.com/user-attachments/assets/3e5dd95e-6f92-4b46-a268-19ce8e3608ea" />
 
 # DS Updater
 
