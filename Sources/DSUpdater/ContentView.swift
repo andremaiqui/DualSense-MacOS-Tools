@@ -49,7 +49,7 @@ struct ContentView: View {
                 Image(nsImage: image)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 180, height: 90)
+                    .frame(width: 240, height: 135)
                     .accessibilityLabel(localized("Controle DualSense"))
             } else {
                 Image(systemName: "gamecontroller.fill")
