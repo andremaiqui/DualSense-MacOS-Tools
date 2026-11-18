@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct ContentView: View {
     @ObservedObject var model = UpdaterModel.shared
@@ -43,11 +44,20 @@ struct ContentView: View {
 
     private var header: some View {
         VStack(spacing: 14) {
-            Image("DualSenseController", bundle: .module)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 240, height: 135)
-                .accessibilityLabel(localized("Controle DualSense"))
+            if let imageURL = Bundle.module.url(forResource: "DualSenseController", withExtension: "png"),
+               let image = NSImage(contentsOf: imageURL) {
+                Image(nsImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 240, height: 135)
+                    .accessibilityLabel(localized("Controle DualSense"))
+            } else {
+                Image(systemName: "gamecontroller.fill")
+                    .font(.system(size: 38, weight: .semibold))
+                    .frame(width: 92, height: 92)
+                    .glassEffect(.regular, in: .circle)
+                    .accessibilityLabel(localized("Controle DualSense"))
+            }
             VStack(spacing: 3) {
                 Text("Firmware do controle")
                     .font(.system(size: 26, weight: .bold, design: .rounded))

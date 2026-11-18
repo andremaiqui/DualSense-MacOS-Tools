@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "DSUpdater",
+    defaultLocalization: "pt-BR",
     platforms: [.macOS(.v26)],
     targets: [
         .executableTarget(
