@@ -141,7 +141,11 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        VStack {
+        VStack(spacing: 12) {
+            Text("Settings")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+
             Form {
                 Picker(appLocalized("Idioma do app", language: settings.language), selection: $settings.language) {
                     ForEach(AppLanguage.allCases) { language in
@@ -158,6 +162,7 @@ struct SettingsView: View {
             .formStyle(.grouped)
         }
         .scenePadding()
+        .padding(.top, 10)
         .frame(width: 360, height: 220)
         .animation(.easeInOut(duration: 0.35), value: settings.appearance)
     }
