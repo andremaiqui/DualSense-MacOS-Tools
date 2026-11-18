@@ -1,12 +1,41 @@
 import SwiftUI
 
+enum AppWindowRole {
+    case main
+    case settings
+}
+
+struct WindowConfigurator: NSViewRepresentable {
+    let role: AppWindowRole
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async {
+            if let window = view.window {
+                AppDelegate.configure(window, as: role)
+            }
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        DispatchQueue.main.async {
+            if let window = nsView.window {
+                AppDelegate.configure(window, as: role)
+            }
+        }
+    }
+}
+
 final class AppDelegate: NSObject, NSApplicationDelegate {
     static func showAboutPanel() {
         NSApp.orderFrontStandardAboutPanel(options: [
             .applicationVersion: "Version 0.1.0 (Developers: Andre Maiqui, Ollie Judge, nchie, VolksDroid)"
         ])
-        if let aboutWindow = NSApp.keyWindow {
-            configureAboutPanel(aboutWindow)
+        DispatchQueue.main.async {
+            if let aboutWindow = NSApp.keyWindow {
+                configureAboutPanel(aboutWindow)
+            }
         }
     }
 
@@ -24,14 +53,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         DispatchQueue.main.async { NSApp.windows.forEach(Self.configureWindow) }
     }
 
-    private static func configureWindow(_ window: NSWindow) {
-        if window.title.localizedCaseInsensitiveContains("settings") {
-            window.titlebarAppearsTransparent = true
-            window.titlebarSeparatorStyle = .none
-            window.titleVisibility = .hidden
+    static func configure(_ window: NSWindow, as role: AppWindowRole) {
+        configureChrome(of: window)
+
+        switch role {
+        case .main:
+            window.title = "DSUpdater"
+            window.miniwindowTitle = "DSUpdater"
+            removeWindowTitle(from: window)
+        case .settings:
             window.title = "Settings"
             window.isMovableByWindowBackground = true
             window.isExcludedFromWindowsMenu = true
+            installWindowTitle("Settings", in: window)
+        }
+    }
+
+    private static func configureWindow(_ window: NSWindow) {
+        if window.title.localizedCaseInsensitiveContains("settings") {
+            configure(window, as: .settings)
             return
         }
 
@@ -40,16 +80,49 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        window.titlebarAppearsTransparent = true
-        window.titlebarSeparatorStyle = .none
-        window.titleVisibility = .hidden
-        window.title = "DSUpdater"
-        window.miniwindowTitle = "DSUpdater"
+        configure(window, as: .main)
     }
 
     private static func configureAboutPanel(_ window: NSWindow) {
+        configureChrome(of: window)
         window.title = "About"
-        window.titleVisibility = .visible
+        installWindowTitle("About", in: window)
+    }
+
+    private static func configureChrome(of window: NSWindow) {
+        window.styleMask.insert(.fullSizeContentView)
+        window.titlebarAppearsTransparent = true
+        window.titlebarSeparatorStyle = .none
+        window.titleVisibility = .hidden
+    }
+
+    private static func installWindowTitle(_ title: String, in window: NSWindow) {
+        guard let contentView = window.contentView else { return }
+
+        if let label = contentView.subviews.first(where: {
+            $0.identifier == NSUserInterfaceItemIdentifier("DSUpdater.WindowTitle")
+        }) as? NSTextField {
+            label.stringValue = title
+            return
+        }
+
+        let label = NSTextField(labelWithString: title)
+        label.identifier = NSUserInterfaceItemIdentifier("DSUpdater.WindowTitle")
+        label.font = .systemFont(ofSize: 17, weight: .semibold)
+        label.alignment = .center
+        label.textColor = .labelColor
+        label.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16)
+        ])
+    }
+
+    private static func removeWindowTitle(from window: NSWindow) {
+        window.contentView?.subviews.first(where: {
+            $0.identifier == NSUserInterfaceItemIdentifier("DSUpdater.WindowTitle")
+        })?.removeFromSuperview()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
@@ -86,6 +159,7 @@ struct DSUpdaterApp: App {
             ContentView()
                 .environment(\.locale, appLanguage.locale)
                 .animation(.easeInOut(duration: 0.35), value: appAppearance)
+                .background(WindowConfigurator(role: .main))
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
@@ -100,6 +174,7 @@ struct DSUpdaterApp: App {
         Settings {
             SettingsView()
                 .environment(\.locale, appLanguage.locale)
+                .background(WindowConfigurator(role: .settings))
         }
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 360, height: 220)
