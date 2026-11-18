@@ -41,3 +41,5 @@
 "Padrão do sistema" = "Predeterminado del sistema";
 "Claro" = "Claro";
 "Escuro" = "Oscuro";
+"Tempo limite excedido. Confira a conexão e tente novamente." = "Se ha agotado el tiempo de espera. Comprueba la conexión e inténtalo de nuevo.";
+"Não foi possível confirmar a versão instalada. Reconecte o controle e confira antes de tentar novamente." = "No se ha podido confirmar la versión instalada. Vuelve a conectar el mando y compruébala antes de intentarlo de nuevo.";

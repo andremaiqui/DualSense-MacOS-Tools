@@ -41,3 +41,5 @@
 "Padrão do sistema" = "システム設定";
 "Claro" = "ライト";
 "Escuro" = "ダーク";
+"Tempo limite excedido. Confira a conexão e tente novamente." = "時間切れになりました。接続を確認してもう一度試してください。";
+"Não foi possível confirmar a versão instalada. Reconecte o controle e confira antes de tentar novamente." = "インストール済みのバージョンを確認できませんでした。コントローラーを接続し直して確認してから、もう一度試してください。";

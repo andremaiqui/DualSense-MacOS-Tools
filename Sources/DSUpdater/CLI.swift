@@ -3,6 +3,24 @@ import Foundation
 struct CLIResult {
     let status: Int32
     let lines: [String]
+    let timedOut: Bool
+}
+
+private final class TimeoutState: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = false
+
+    func markTimedOut() {
+        lock.lock()
+        value = true
+        lock.unlock()
+    }
+
+    var timedOut: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return value
+    }
 }
 
 /// Acumula a saída do processo e a entrega linha a linha.
@@ -54,9 +72,14 @@ enum CLI {
 
     /// Executa o dsmactools sem terminal (stdin vazio), o que ativa o modo não interativo.
     static func run(_ args: [String],
+                    timeout: TimeInterval? = nil,
                     onLine: @escaping @Sendable (String) -> Void = { _ in }) async -> CLIResult {
         guard let url = binaryURL else {
-            return CLIResult(status: 127, lines: [appLocalized("O binário dsmactools não foi encontrado.")])
+            return CLIResult(
+                status: 127,
+                lines: [appLocalized("O binário dsmactools não foi encontrado.")],
+                timedOut: false
+            )
         }
         return await withCheckedContinuation { continuation in
             let process = Process()
@@ -67,23 +90,45 @@ enum CLI {
             process.standardOutput = pipe
             process.standardError = pipe
             let collector = LineCollector(onLine: onLine)
+            let timeoutState = TimeoutState()
+            let timeoutWorkItem = DispatchWorkItem {
+                guard process.isRunning else { return }
+                timeoutState.markTimedOut()
+                process.terminate()
+            }
 
             pipe.fileHandleForReading.readabilityHandler = { handle in
                 let data = handle.availableData
                 if !data.isEmpty { collector.feed(data) }
             }
             process.terminationHandler = { proc in
+                timeoutWorkItem.cancel()
                 pipe.fileHandleForReading.readabilityHandler = nil
                 let rest = pipe.fileHandleForReading.readDataToEndOfFile()
                 if !rest.isEmpty { collector.feed(rest) }
                 collector.flush()
-                continuation.resume(returning: CLIResult(status: proc.terminationStatus,
-                                                         lines: collector.all))
+                continuation.resume(returning: CLIResult(
+                    status: timeoutState.timedOut ? 124 : proc.terminationStatus,
+                    lines: collector.all,
+                    timedOut: timeoutState.timedOut
+                ))
             }
-            do { try process.run() } catch {
+            do {
+                try process.run()
+                if let timeout {
+                    DispatchQueue.global().asyncAfter(
+                        deadline: .now() + timeout,
+                        execute: timeoutWorkItem
+                    )
+                }
+            } catch {
                 pipe.fileHandleForReading.readabilityHandler = nil
-                continuation.resume(returning: CLIResult(status: 126,
-                                                         lines: [error.localizedDescription]))
+                timeoutWorkItem.cancel()
+                continuation.resume(returning: CLIResult(
+                    status: 126,
+                    lines: [error.localizedDescription],
+                    timedOut: false
+                ))
             }
         }
     }

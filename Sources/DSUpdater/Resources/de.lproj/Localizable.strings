@@ -41,3 +41,5 @@
 "Padrão do sistema" = "Systemeinstellung";
 "Claro" = "Hell";
 "Escuro" = "Dunkel";
+"Tempo limite excedido. Confira a conexão e tente novamente." = "Zeitüberschreitung. Prüfe die Verbindung und versuche es erneut.";
+"Não foi possível confirmar a versão instalada. Reconecte o controle e confira antes de tentar novamente." = "Die installierte Version konnte nicht bestätigt werden. Schließe den Controller erneut an und prüfe sie, bevor du es erneut versuchst.";

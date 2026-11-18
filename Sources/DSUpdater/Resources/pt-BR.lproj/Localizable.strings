@@ -41,3 +41,5 @@
 "Padrão do sistema" = "Padrão do sistema";
 "Claro" = "Claro";
 "Escuro" = "Escuro";
+"Tempo limite excedido. Confira a conexão e tente novamente." = "Tempo limite excedido. Confira a conexão e tente novamente.";
+"Não foi possível confirmar a versão instalada. Reconecte o controle e confira antes de tentar novamente." = "Não foi possível confirmar a versão instalada. Reconecte o controle e confira antes de tentar novamente.";

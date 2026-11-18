@@ -41,3 +41,5 @@
 "Padrão do sistema" = "Réglage du système";
 "Claro" = "Clair";
 "Escuro" = "Sombre";
+"Tempo limite excedido. Confira a conexão e tente novamente." = "Le délai d’attente est dépassé. Vérifiez la connexion et réessayez.";
+"Não foi possível confirmar a versão instalada. Reconecte o controle e confira antes de tentar novamente." = "Impossible de confirmer la version installée. Reconnectez la manette et vérifiez-la avant de réessayer.";

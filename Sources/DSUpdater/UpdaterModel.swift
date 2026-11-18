@@ -13,6 +13,65 @@ struct ControllerInfo: Decodable {
     var name: String { isEdge ? "DualSense Edge" : "DualSense" }
 }
 
+enum FirmwareAvailability: Equatable {
+    case unknown
+    case upToDate
+    case available
+}
+
+struct FirmwareCheckResult: Equatable {
+    let latest: String?
+    let availability: FirmwareAvailability
+}
+
+enum FirmwareCheckParser {
+    static func parse(lines: [String], currentVersion: String) -> FirmwareCheckResult {
+        let latest = lines.lazy.compactMap(latestVersion(in:)).first
+        let output = lines.joined(separator: "\n").lowercased()
+
+        if output.contains("no newer firmware") || output.contains("up to date") {
+            return FirmwareCheckResult(latest: latest, availability: .upToDate)
+        }
+        if output.contains("update available") || output.contains("newer firmware available") {
+            return FirmwareCheckResult(latest: latest, availability: .available)
+        }
+        if let latest, let current = numericVersion(currentVersion), let newest = numericVersion(latest) {
+            if current == newest {
+                return FirmwareCheckResult(latest: latest, availability: .upToDate)
+            }
+            if current < newest {
+                return FirmwareCheckResult(latest: latest, availability: .available)
+            }
+        }
+        return FirmwareCheckResult(latest: latest, availability: .unknown)
+    }
+
+    static func versionsMatch(_ lhs: String, _ rhs: String) -> Bool {
+        if let left = numericVersion(lhs), let right = numericVersion(rhs) {
+            return left == right
+        }
+        return lhs.caseInsensitiveCompare(rhs) == .orderedSame
+    }
+
+    private static func latestVersion(in line: String) -> String? {
+        guard line.localizedCaseInsensitiveContains("latest"),
+              let separator = line.lastIndex(of: ":") else { return nil }
+
+        return line[line.index(after: separator)...]
+            .split(whereSeparator: { $0.isWhitespace || $0 == "," })
+            .map(String.init)
+            .first(where: { numericVersion($0) != nil })
+    }
+
+    private static func numericVersion(_ value: String) -> UInt64? {
+        let token = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if token.lowercased().hasPrefix("0x") {
+            return UInt64(token.dropFirst(2), radix: 16)
+        }
+        return UInt64(token)
+    }
+}
+
 @MainActor
 final class UpdaterModel: ObservableObject {
     static let shared = UpdaterModel()
@@ -25,12 +84,10 @@ final class UpdaterModel: ObservableObject {
         case finished(String)
         case failed(String)
     }
-    enum Availability { case unknown, upToDate, available }
-
     @Published var phase: Phase = .loading
     @Published var info: ControllerInfo?
     @Published var latest: String?
-    @Published var availability: Availability = .unknown
+    @Published var availability: FirmwareAvailability = .unknown
     @Published var checkNote: String?
     @Published var progress: Double = 0
     @Published var status = ""
@@ -93,7 +150,7 @@ final class UpdaterModel: ObservableObject {
         latest = nil
         checkNote = nil
 
-        let read = await CLI.run(["--print-firmware-info", "--json"])
+        let read = await CLI.run(["--print-firmware-info", "--json"], timeout: 20)
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         guard read.status == 0,
@@ -101,22 +158,24 @@ final class UpdaterModel: ObservableObject {
               let data = json.data(using: .utf8),
               let parsed = try? decoder.decode(ControllerInfo.self, from: data) else {
             info = nil
-            phase = .noController(Self.tail(read.lines))
+            phase = .noController(
+                read.timedOut
+                    ? appLocalized("Tempo limite excedido. Confira a conexão e tente novamente.")
+                    : Self.tail(read.lines)
+            )
             return
         }
         info = parsed
         phase = .ready
 
-        let check = await CLI.run(["--check", "--path", parsed.path])
-        for line in check.lines {
-            if let r = line.range(of: "Latest on Sony's server:") {
-                latest = line[r.upperBound...].trimmingCharacters(in: .whitespaces)
-            }
-            if line.contains("No newer firmware") { availability = .upToDate }
-            if line.contains("Update available") { availability = .available }
-        }
+        let check = await CLI.run(["--check", "--path", parsed.path], timeout: 30)
+        let result = FirmwareCheckParser.parse(lines: check.lines, currentVersion: parsed.versionHex)
+        latest = result.latest
+        availability = result.availability
         if check.status != 0 || availability == .unknown {
-            checkNote = appLocalized("Não foi possível consultar a Sony:") + " " + Self.tail(check.lines)
+            checkNote = check.timedOut
+                ? appLocalized("Tempo limite excedido. Confira a conexão e tente novamente.")
+                : appLocalized("Não foi possível consultar a Sony:") + " " + Self.tail(check.lines)
         }
     }
 
@@ -124,6 +183,7 @@ final class UpdaterModel: ObservableObject {
 
     func install() async {
         guard let target = info, !isUpdating else { return }
+        let expectedVersion = latest
         phase = .updating
         progress = 0
         log = []
@@ -132,19 +192,27 @@ final class UpdaterModel: ObservableObject {
             options: [.idleSystemSleepDisabled, .userInitiated],
             reason: "Atualizando firmware do controle")
 
-        let result = await CLI.run(["--update-latest", "--yes", "--path", target.path]) { line in
+        let result = await CLI.run(
+            ["--update-latest", "--yes", "--path", target.path],
+            timeout: 600
+        ) { line in
             Task { @MainActor in UpdaterModel.shared.handle(line) }
         }
         await Task.yield()
         quietUntil = Date().addingTimeInterval(12)
         if let a = activity { ProcessInfo.processInfo.endActivity(a); activity = nil }
 
-        if result.status == 0 {
+        if result.timedOut {
+            phase = .failed(appLocalized("Tempo limite excedido. Confira a conexão e tente novamente."))
+        } else if result.status == 0 {
             let summary = result.lines.last ?? appLocalized("Atualização concluída.")
-            try? await Task.sleep(nanoseconds: 3_000_000_000) // o controle reinicia
-            phase = .ready
-            await refresh()
-            if info != nil { phase = .finished(summary) }
+            if await confirmInstalledVersion(previous: target.versionHex, expected: expectedVersion) {
+                phase = .finished(summary)
+            } else {
+                phase = .failed(
+                    appLocalized("Não foi possível confirmar a versão instalada. Reconecte o controle e confira antes de tentar novamente.")
+                )
+            }
         } else {
             phase = .failed(Self.tail(result.lines))
         }
@@ -172,6 +240,23 @@ final class UpdaterModel: ObservableObject {
 
     private static func tail(_ lines: [String]) -> String {
         let t = lines.suffix(3).joined(separator: "\n")
-        return t.isEmpty ? "Sem detalhes." : t
+        return t.isEmpty ? appLocalized("Sem detalhes.") : t
+    }
+
+    private func confirmInstalledVersion(previous: String, expected: String?) async -> Bool {
+        for _ in 0..<3 {
+            try? await Task.sleep(for: .seconds(3))
+            phase = .ready
+            await refresh()
+
+            guard let installed = info?.versionHex,
+                  !FirmwareCheckParser.versionsMatch(installed, previous) else { continue }
+
+            if let expected {
+                return FirmwareCheckParser.versionsMatch(installed, expected)
+            }
+            return true
+        }
+        return false
     }
 }

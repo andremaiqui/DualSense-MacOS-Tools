@@ -41,3 +41,5 @@
 "Padrão do sistema" = "System default";
 "Claro" = "Light";
 "Escuro" = "Dark";
+"Tempo limite excedido. Confira a conexão e tente novamente." = "The operation timed out. Check the connection and try again.";
+"Não foi possível confirmar a versão instalada. Reconecte o controle e confira antes de tentar novamente." = "Unable to confirm the installed version. Reconnect the controller and check it before trying again.";

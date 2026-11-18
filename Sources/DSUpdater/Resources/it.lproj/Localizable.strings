@@ -41,3 +41,5 @@
 "Padrão do sistema" = "Impostazione di sistema";
 "Claro" = "Chiaro";
 "Escuro" = "Scuro";
+"Tempo limite excedido. Confira a conexão e tente novamente." = "Tempo scaduto. Controlla la connessione e riprova.";
+"Não foi possível confirmar a versão instalada. Reconecte o controle e confira antes de tentar novamente." = "Impossibile confermare la versione installata. Ricollega il controller e verificala prima di riprovare.";

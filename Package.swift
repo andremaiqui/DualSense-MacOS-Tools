@@ -10,6 +10,10 @@ let package = Package(
             name: "DSUpdater",
             path: "Sources/DSUpdater",
             resources: [.process("Resources")]
+        ),
+        .testTarget(
+            name: "DSUpdaterTests",
+            dependencies: ["DSUpdater"]
         )
     ],
     swiftLanguageModes: [.v5]
