@@ -75,6 +75,6 @@ struct SettingsView: View {
         }
         .formStyle(.grouped)
         .scenePadding()
-        .frame(width: 360)
+        .frame(width: 360, height: 120)
     }
 }

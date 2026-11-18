@@ -65,5 +65,7 @@ struct DSUpdaterApp: App {
             SettingsView()
                 .environment(\.locale, appLanguage.locale)
         }
+        .defaultSize(width: 360, height: 120)
+        .windowResizability(.contentSize)
     }
 }
