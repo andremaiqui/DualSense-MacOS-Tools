@@ -138,8 +138,15 @@ struct ContentView: View {
                             .multilineTextAlignment(.center)
                     }
                 }
-                Button("Verificar de novo") { Task { await model.refresh() } }
-                    .buttonStyle(.glass)
+                Button { Task { await model.refresh() } } label: {
+                    Label("Buscar atualizações", systemImage: "arrow.clockwise")
+                        .font(.headline)
+                        .padding(.horizontal, 22)
+                        .padding(.vertical, 10)
+                }
+                .buttonStyle(.glass)
+                .controlSize(.large)
+                .padding(.top, 8)
             }
         }
     }
