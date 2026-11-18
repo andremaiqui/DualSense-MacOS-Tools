@@ -89,7 +89,7 @@ struct DSUpdaterApp: App {
         .windowResizability(.contentSize)
         .commands {
             CommandGroup(replacing: .appInfo) {
-                Button("About DS Updater") {
+                Button("About DSUpdater") {
                     AppDelegate.showAboutPanel()
                 }
             }
