@@ -48,8 +48,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private static func configureAboutPanel(_ window: NSWindow) {
-        window.title = "About"
-        window.titleVisibility = .visible
+        window.title = ""
+        window.titleVisibility = .hidden
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
@@ -91,7 +91,7 @@ struct DSUpdaterApp: App {
         .windowResizability(.contentSize)
         .commands {
             CommandGroup(replacing: .appInfo) {
-                Button("About DSUpdater") {
+                Button("About") {
                     AppDelegate.showAboutPanel()
                 }
             }
