@@ -1,6 +1,6 @@
 <div align="center">
 
-<img width="300" alt="DS Updater" src="https://github.com/user-attachments/assets/3e5dd95e-6f92-4b46-a268-19ce8e3608ea" />
+<img width="200" alt="DS Updater" src="https://github.com/user-attachments/assets/3e5dd95e-6f92-4b46-a268-19ce8e3608ea" />
 
 # DS Updater
 
@@ -72,9 +72,10 @@ Para abrir o código no Xcode, escolha `File > Open…` e selecione a pasta que 
 
 <div align="center">
 
-<img width="1200" alt="Visão geral do DS Updater em execução" src="docs/images/ds-updater-usage-overview.png" />
+<img width="1680" height="1050" alt="Captura de Tela 2026-11-18 às 18 30 02" src="https://github.com/user-attachments/assets/0e90075f-6ee9-443e-a00e-321657bf533a" />
 
 </div>
+
 
 1. Conecte o controle com um cabo USB de dados.
 2. Abra o app e confira a versão atual e a versão disponível.
