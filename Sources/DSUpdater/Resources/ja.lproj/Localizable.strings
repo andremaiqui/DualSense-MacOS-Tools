@@ -1,4 +1,9 @@
 "Firmware do controle" = "コントローラーのファームウェア";
+"Modelo" = "モデル";
+"Número de série" = "シリアル番号";
+"Bateria" = "バッテリー";
+"Não informado" = "未提供";
+"Carregando" = "充電中";
 "Buscar atualizações" = "アップデートを確認";
 "Configurações…" = "設定…";
 "Idioma do app" = "アプリの言語";

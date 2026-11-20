@@ -86,6 +86,7 @@ final class UpdaterModel: ObservableObject {
     }
     @Published var phase: Phase = .loading
     @Published var info: ControllerInfo?
+    @Published var controllerDetails: ControllerDetails?
     @Published var latest: String?
     @Published var availability: FirmwareAvailability = .unknown
     @Published var checkNote: String?
@@ -121,6 +122,7 @@ final class UpdaterModel: ObservableObject {
         if isUpdating || Date() < quietUntil { return }
         pending?.cancel()
         info = nil
+        controllerDetails = nil
         latest = nil
         checkNote = nil
         availability = .unknown
@@ -145,7 +147,9 @@ final class UpdaterModel: ObservableObject {
     }
 
     private func performRefresh() async {
-        phase = .loading
+        if info == nil {
+            phase = .loading
+        }
         availability = .unknown
         latest = nil
         checkNote = nil
@@ -177,6 +181,31 @@ final class UpdaterModel: ObservableObject {
                 ? appLocalized("Tempo limite excedido. Confira a conexão e tente novamente.")
                 : appLocalized("Não foi possível consultar a Sony:") + " " + Self.tail(check.lines)
         }
+
+        let previousDetails = controllerDetails
+        let refreshedDetails = await Task.detached(priority: .userInitiated) {
+            var details = ControllerDetails(serialNumber: nil, batteryLevel: nil, isCharging: nil)
+            for attempt in 0..<3 {
+                let next = ControllerDetailsReader.read()
+                details = ControllerDetails(
+                    serialNumber: next.serialNumber ?? details.serialNumber,
+                    batteryLevel: next.batteryLevel ?? details.batteryLevel,
+                    isCharging: next.isCharging ?? details.isCharging
+                )
+                if details.serialNumber != nil, details.batteryLevel != nil {
+                    break
+                }
+                if attempt < 2 {
+                    Thread.sleep(forTimeInterval: 0.4)
+                }
+            }
+            return details
+        }.value
+        controllerDetails = ControllerDetails(
+            serialNumber: refreshedDetails.serialNumber ?? previousDetails?.serialNumber,
+            batteryLevel: refreshedDetails.batteryLevel ?? previousDetails?.batteryLevel,
+            isCharging: refreshedDetails.isCharging ?? previousDetails?.isCharging
+        )
     }
 
     // MARK: Instalação

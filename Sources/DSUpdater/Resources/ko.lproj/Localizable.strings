@@ -1,4 +1,9 @@
 "Firmware do controle" = "컨트롤러 펌웨어";
+"Modelo" = "모델";
+"Número de série" = "일련 번호";
+"Bateria" = "배터리";
+"Não informado" = "정보 없음";
+"Carregando" = "충전 중";
 "Buscar atualizações" = "업데이트 확인";
 "Configurações…" = "설정…";
 "Idioma do app" = "앱 언어";

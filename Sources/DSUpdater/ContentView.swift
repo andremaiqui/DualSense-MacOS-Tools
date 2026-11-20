@@ -17,7 +17,10 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 20) {
             header
-            content
+            ScrollView {
+                content
+            }
+            .scrollIndicators(.hidden)
             Spacer(minLength: 0)
             Text(localized("Software independente e não oficial. Firmware pertence à Sony."))
                 .font(.caption2).foregroundStyle(.secondary)
@@ -25,7 +28,7 @@ struct ContentView: View {
         .padding(.horizontal, 28)
         .padding(.top, 40)
         .padding(.bottom, 16)
-        .frame(width: 480, height: 640)
+        .frame(width: 480, height: 740)
         .animation(.smooth, value: model.phase)
         .animation(.smooth, value: model.availability)
         .onChange(of: appLanguage) { _, _ in
@@ -34,6 +37,8 @@ struct ContentView: View {
         }
         .task {
             model.startWatching()
+            try? await Task.sleep(for: .seconds(1))
+            guard !Task.isCancelled else { return }
             await model.refresh()
         }
         .alert(localized("Instalar firmware?"), isPresented: $confirming) {
@@ -128,6 +133,13 @@ struct ContentView: View {
     private var infoCard: some View {
         VStack(spacing: 10) {
             if let i = model.info {
+                row(localized("Modelo"), i.name)
+                Divider()
+                row(localized("Número de série"), model.controllerDetails?.serialNumber ?? localized("Não informado"))
+                Divider()
+                let batteryLevel = model.controllerDetails?.batteryLevel
+                batteryRow(batteryLevel)
+                Divider()
                 row(localized("Firmware atual"), i.versionHex)
                 Divider()
                 row(localized("Compilação"), i.buildDate.split(separator: " ").joined(separator: " ") + " " + i.buildTime)
@@ -223,6 +235,19 @@ struct ContentView: View {
     }
 
     // MARK: Peças
+
+    private func batteryRow(_ level: Int?) -> some View {
+        let status: String
+        if let level {
+            let chargeState = model.controllerDetails?.isCharging == true
+                ? " · " + localized("Carregando")
+                : ""
+            status = "\(level)%\(chargeState)"
+        } else {
+            status = localized("Não informado")
+        }
+        return row(localized("Bateria"), status)
+    }
 
     private func row(_ k: String, _ v: String) -> some View {
         HStack { Text(k).foregroundStyle(.secondary); Spacer(); Text(v).monospaced() }
