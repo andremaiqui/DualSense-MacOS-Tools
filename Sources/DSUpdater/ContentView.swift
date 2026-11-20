@@ -21,6 +21,7 @@ struct ContentView: View {
                 content
             }
             .scrollIndicators(.hidden)
+            .scrollContentBackground(.hidden)
             Spacer(minLength: 0)
             Text(localized("Software independente e não oficial. Firmware pertence à Sony."))
                 .font(.caption2).foregroundStyle(.secondary)

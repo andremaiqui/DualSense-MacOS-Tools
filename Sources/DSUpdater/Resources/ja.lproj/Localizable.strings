@@ -32,6 +32,7 @@
 "Sair agora pode danificar o controle. Aguarde terminar." = "今終了するとコントローラーが損傷するおそれがあります。完了までお待ちください。";
 "Controle desconectado." = "コントローラーが接続解除されました。";
 "Não foi possível consultar a Sony:" = "Sonyを確認できませんでした：";
+"O controle está ocupado por outro app ou processo do macOS. Feche jogos e ferramentas que possam usá-lo e tente novamente." = "コントローラーは別のアプリまたはmacOSプロセスによって使用中です。使用している可能性のあるゲームやツールを終了して、もう一度お試しください。";
 "Preparando…" = "準備中…";
 "Atualização concluída." = "アップデートが完了しました。";
 "Gravando firmware…" = "ファームウェアを書き込み中…";

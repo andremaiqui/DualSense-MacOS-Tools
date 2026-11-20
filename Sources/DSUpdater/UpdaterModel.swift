@@ -172,14 +172,22 @@ final class UpdaterModel: ObservableObject {
         info = parsed
         phase = .ready
 
-        let check = await CLI.run(["--check", "--path", parsed.path], timeout: 30)
+        var check = await CLI.run(["--check", "--path", parsed.path], timeout: 30)
+        if check.status != 0, Self.isExclusiveHIDError(check.lines) {
+            try? await Task.sleep(for: .milliseconds(500))
+            check = await CLI.run(["--check", "--path", parsed.path], timeout: 30)
+        }
         let result = FirmwareCheckParser.parse(lines: check.lines, currentVersion: parsed.versionHex)
         latest = result.latest
         availability = result.availability
         if check.status != 0 || availability == .unknown {
-            checkNote = check.timedOut
-                ? appLocalized("Tempo limite excedido. Confira a conexão e tente novamente.")
-                : appLocalized("Não foi possível consultar a Sony:") + " " + Self.tail(check.lines)
+            if check.timedOut {
+                checkNote = appLocalized("Tempo limite excedido. Confira a conexão e tente novamente.")
+            } else if Self.isExclusiveHIDError(check.lines) {
+                checkNote = appLocalized("O controle está ocupado por outro app ou processo do macOS. Feche jogos e ferramentas que possam usá-lo e tente novamente.")
+            } else {
+                checkNote = appLocalized("Não foi possível consultar a Sony:") + " " + Self.tail(check.lines)
+            }
         }
 
         let previousDetails = controllerDetails
@@ -265,6 +273,13 @@ final class UpdaterModel: ObservableObject {
         } else if line.contains("Finalization sent") {
             status = appLocalized("Finalizando…")
         }
+    }
+
+    private static func isExclusiveHIDError(_ lines: [String]) -> Bool {
+        let output = lines.joined(separator: "\n").localizedLowercase
+        return output.contains("exclusive access")
+            || output.contains("device already open")
+            || output.contains("e00002c5")
     }
 
     private static func tail(_ lines: [String]) -> String {

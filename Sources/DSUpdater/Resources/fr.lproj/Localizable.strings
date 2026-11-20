@@ -32,6 +32,7 @@
 "Sair agora pode danificar o controle. Aguarde terminar." = "Quitter maintenant peut endommager la manette. Attendez la fin de la mise à jour.";
 "Controle desconectado." = "Manette déconnectée.";
 "Não foi possível consultar a Sony:" = "Impossible de vérifier auprès de Sony :";
+"O controle está ocupado por outro app ou processo do macOS. Feche jogos e ferramentas que possam usá-lo e tente novamente." = "La manette est utilisée par une autre app ou un processus de macOS. Fermez les jeux et outils susceptibles de l’utiliser, puis réessayez.";
 "Preparando…" = "Préparation…";
 "Atualização concluída." = "Mise à jour terminée.";
 "Gravando firmware…" = "Écriture du firmware…";

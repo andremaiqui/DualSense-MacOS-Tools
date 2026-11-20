@@ -32,6 +32,7 @@
 "Sair agora pode danificar o controle. Aguarde terminar." = "Salir ahora puede dañar el mando. Espera a que termine.";
 "Controle desconectado." = "Mando desconectado.";
 "Não foi possível consultar a Sony:" = "No se ha podido consultar a Sony:";
+"O controle está ocupado por outro app ou processo do macOS. Feche jogos e ferramentas que possam usá-lo e tente novamente." = "El mando está ocupado por otra app o proceso de macOS. Cierra los juegos y herramientas que puedan estar usándolo e inténtalo de nuevo.";
 "Preparando…" = "Preparando…";
 "Atualização concluída." = "Actualización completada.";
 "Gravando firmware…" = "Escribiendo el firmware…";

@@ -32,6 +32,7 @@
 "Sair agora pode danificar o controle. Aguarde terminar." = "Uscire ora potrebbe danneggiare il controller. Attendi il completamento dell’aggiornamento.";
 "Controle desconectado." = "Controller disconnesso.";
 "Não foi possível consultar a Sony:" = "Impossibile verificare con Sony:";
+"O controle está ocupado por outro app ou processo do macOS. Feche jogos e ferramentas que possam usá-lo e tente novamente." = "Il controller è occupato da un’altra app o da un processo di macOS. Chiudi giochi e strumenti che potrebbero usarlo, poi riprova.";
 "Preparando…" = "Preparazione…";
 "Atualização concluída." = "Aggiornamento completato.";
 "Gravando firmware…" = "Scrittura del firmware…";
