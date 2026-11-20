@@ -196,7 +196,7 @@ final class UpdaterModel: ObservableObject {
                     break
                 }
                 if attempt < 2 {
-                    Thread.sleep(forTimeInterval: 0.4)
+                    try? await Task.sleep(for: .milliseconds(400))
                 }
             }
             return details

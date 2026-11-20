@@ -16,8 +16,10 @@ Esta versão adiciona informações do controle e melhora a estabilidade da leit
 ## Requisitos e observações
 
 - macOS 26 ou posterior.
+- Mac com Apple Silicon (arm64).
 - Controle conectado por USB para leitura do número de série e dos dados HID.
 - O nível HID tem resolução em faixas; quando o GameController não fornece a porcentagem, o valor pode diferir do exibido pelo macOS.
+- O app é distribuído com assinatura ad hoc, sem notarização da Apple. Na primeira abertura, use o menu de contexto do Finder e escolha **Abrir**.
 - O app continua sendo independente e não oficial. O firmware pertence à Sony.
 
 ## Validação
