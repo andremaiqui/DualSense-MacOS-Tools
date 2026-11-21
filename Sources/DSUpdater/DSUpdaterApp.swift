@@ -3,7 +3,7 @@ import SwiftUI
 final class AppDelegate: NSObject, NSApplicationDelegate {
     static func showAboutPanel() {
         NSApp.orderFrontStandardAboutPanel(options: [
-            .applicationVersion: "Version 1.0.4 (Developers: Andre Maiqui, Ollie Judge, nchie, VolksDroid)"
+            .applicationVersion: "Version 1.0.5 (Developers: Andre Maiqui, Ollie Judge, nchie, VolksDroid)"
         ])
         if let aboutWindow = NSApp.keyWindow {
             configureAboutPanel(aboutWindow)
