@@ -25,7 +25,7 @@ struct ContentView: View {
         .padding(.horizontal, 28)
         .padding(.top, 40)
         .padding(.bottom, 16)
-        .frame(width: 480, height: 820)
+        .frame(width: 480, height: 760)
         .animation(.smooth, value: model.phase)
         .animation(.smooth, value: model.availability)
         .onChange(of: appLanguage) { _, _ in
