@@ -88,7 +88,7 @@ Não desconecte o controle nem feche o app durante a gravação do firmware.
 
 ```sh
 ./build_app.sh
-ditto -c -k --sequesterRsrc --keepParent DSUpdater.app DSUpdater-1.0.2.zip
+ditto -c -k --sequesterRsrc --keepParent DSUpdater.app DSUpdater-1.0.3.zip
 ```
 
 O app gerado é assinado ad-hoc. Para distribuição pública, assine com um certificado **Developer ID** e envie o app para notarização da Apple. Testadores podem precisar usar botão direito no app e escolher **Abrir** na primeira execução.
